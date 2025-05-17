@@ -1,0 +1,398 @@
+// Switch to the blogdb database
+use blogdb;
+
+// --- Cleanup: Drop existing collections to ensure a clean slate for re-running the script ---
+//print("--- Dropping existing collections... ---");
+//db.users.drop();
+//db.posts.drop();
+//db.comments.drop();
+//db.roles.drop();
+//db.categories.drop();
+//db.tags.drop();
+//db.statuses.drop();
+//print("--- Collections dropped. ---");
+
+// --- Collection Creation ---
+print("--- Creating collections... ---");
+db.createCollection('users');
+db.createCollection('posts');
+db.createCollection('comments');
+db.createCollection('roles');
+db.createCollection('categories');
+db.createCollection('tags');
+db.createCollection('statuses');
+print("--- Collections created. ---");
+
+// --- Data Insertion ---
+
+// Collection: roles
+print("--- Inserting roles data... ---");
+db.roles.insertMany([
+  {
+    _id: "admin",
+    name: "admin",
+    description: "Có toàn quyền quản trị"
+  },
+  {
+    _id: "author",
+    name: "author",
+    description: "Chỉ được đăng bài viết và bình luận"
+  }
+]);
+
+// Collection: statuses (Used for status field in posts and comments)
+print("--- Inserting statuses data... ---");
+db.statuses.insertMany([
+  { _id: "draft", name: "Draft", description: "Bài viết đang trong quá trình soạn thảo và chưa được công bố." },
+  { _id: "pending", name: "Pending", description: "Bài viết hoặc bình luận đã được gửi nhưng đang chờ duyệt." },
+  { _id: "published", name: "Published", description: "Bài viết đã được công bố và hiển thị trên website." },
+  { _id: "approved", name: "Approved", description: "Bình luận đã được duyệt và hiển thị." },
+  { _id: "rejected", name: "Rejected", description: "Bài viết hoặc bình luận đã bị từ chối." },
+  { _id: "scheduled", name: "Scheduled", description: "Bài viết đã được lên lịch để công bố vào một thời điểm cụ thể." },
+  { _id: "hidden", name: "Hidden", description: "Bài viết hoặc bình luận đã bị ẩn khỏi hiển thị." }
+]);
+
+// Collection: categories (Pre-defining ObjectIds for consistent references)
+print("--- Inserting categories data... ---");
+db.categories.insertMany([
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d1"), name: "Du lịch", slug: "du-lich", description: "Tổng hợp các bài viết về du lịch trong và ngoài nước.", createdAt: ISODate("2025-05-17T07:00:00Z"), updatedAt: ISODate("2025-05-17T07:00:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d2"), name: "Sinh thái", slug: "sinh-thai", description: "Các bài viết về du lịch sinh thái, bảo vệ môi trường và thiên nhiên.", createdAt: ISODate("2025-05-17T07:00:00Z"), updatedAt: ISODate("2025-05-17T07:00:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d3"), name: "Việt Nam", slug: "viet-nam", description: "Tin tức và bài viết về đất nước và con người Việt Nam.", createdAt: ISODate("2025-05-17T07:00:00Z"), updatedAt: ISODate("2025-05-17T07:00:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d4"), name: "Nghệ An", slug: "nghe-an", description: "Các bài viết và thông tin về tỉnh Nghệ An.", createdAt: ISODate("2025-05-17T07:00:00Z"), updatedAt: ISODate("2025-05-17T07:00:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d5"), name: "Ẩm thực", slug: "am-thuc", description: "Các bài viết về ẩm thực, công thức nấu ăn và địa điểm ăn uống.", createdAt: ISODate("2025-05-17T07:00:00Z"), updatedAt: ISODate("2025-05-17T07:00:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d6"), name: "Hà Nội", slug: "ha-noi", description: "Thông tin và bài viết về thủ đô Hà Nội.", createdAt: ISODate("2025-05-17T07:00:00Z"), updatedAt: ISODate("2025-05-17T07:00:00Z") }
+]);
+
+// Collection: tags (Pre-defining ObjectIds for consistent references)
+print("--- Inserting tags data... ---");
+db.tags.insertMany([
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d7"), name: "du lịch", slug: "du-lich", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d8"), name: "sinh thái", slug: "sinh-thai", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5d9"), name: "thiên nhiên", slug: "thien-nhien", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5da"), name: "văn hóa", slug: "van-hoa", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5db"), name: "Nghệ An", slug: "nghe-an", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5dc"), name: "du lịch biển", slug: "du-lich-bien", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5dd"), name: "ẩm thực", slug: "am-thuc", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5de"), name: "Hà Nội", slug: "ha-noi", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5df"), name: "đường phố", slug: "duong-pho", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") },
+  { _id: ObjectId("664654b3c95e5b3e21c3b5e0"), name: "món ăn", slug: "mon-an", createdAt: ISODate("2025-05-17T07:05:00Z"), updatedAt: ISODate("2025-05-17T07:05:00Z") }
+]);
+
+// Collection: users
+print("--- Inserting users data... ---");
+db.users.insertMany([
+  {
+    _id: ObjectId("507f1f77bcf86cd799439011"),
+    username: "xuankien",
+    email: "xuankien@gmail.com",
+    password: "080103",
+    fullName: "Dương Xuân Kiên",
+    avatarUrl: "https://example.com/avatars/kien.jpg",
+    bio: "Tôi là một blogger yêu thích công nghệ",
+    createdAt: ISODate("2025-05-15T09:45:00Z"),
+    updatedAt: ISODate("2025-07-20T14:22:00Z"),
+    role: "admin"
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439012"),
+    username: "xuanthuy",
+    email: "xuanthuy11@gmail.com",
+    password: "123123",
+    fullName: "Đậu Xuân Thủy",
+    avatarUrl: "https://example.com/avatars/thuy.jpg",
+    bio: "Một người đam mê viết lách và du lịch.",
+    createdAt: ISODate("2025-04-01T10:00:00Z"),
+    updatedAt: ISODate("2025-06-10T16:30:00Z"),
+    role: "author"
+  }
+]);
+
+// Collection: posts (Categories, tags, and status are initially strings, will be converted below)
+print("--- Inserting posts data... ---");
+db.posts.insertMany([
+  {
+    _id: ObjectId("507f1f77bcf86cd799439021"),
+    title: "Những trải nghiệm du lịch sinh thái độc đáo ở Việt Nam",
+    slug: "du-lich-sinh-thai-viet-nam",
+    content: "Việt Nam không chỉ có những thành phố sôi động, những bãi biển tuyệt đẹp mà còn có những khu vực với hệ sinh thái phong phú, là điểm đến lý tưởng cho những ai yêu thích du lịch sinh thái. Dưới đây là một vài gợi ý:\n\n* **Vườn quốc gia Cúc Phương:** Khu rừng nguyên sinh với hệ động thực vật đa dạng, là nơi bảo tồn nhiều loài quý hiếm.\n* **Rừng tràm Trà Sư:** Khu rừng ngập mặn với vẻ đẹp hoang sơ và hệ sinh thái độc đáo.\n* **Vịnh Hạ Long:** Di sản thiên nhiên thế giới với hàng nghìn hòn đảo đá vôi kỳ vĩ.\n* **Các khu dự trữ sinh quyển:** Khám phá các khu dự trữ sinh quyển như Cần Giờ, Cát Bà, Mũi Cà Mau...\n* **Các tour du lịch cộng đồng:** Trải nghiệm cuộc sống và văn hóa của người dân địa phương ở các bản làng vùng cao.\n\nDu lịch sinh thái không chỉ giúp bạn khám phá vẻ đẹp của thiên nhiên mà còn góp phần bảo tồn môi trường và hỗ trợ cộng đồng địa phương.",
+    authorId: ObjectId("507f1f77bcf86cd799439011"), // Refers to user "xuankien"
+    categories: ["Du lịch", "Sinh thái", "Việt Nam"],
+    tags: ["du lịch", "sinh thái", "thiên nhiên", "văn hóa"],
+    status: "published",
+    featuredImage: "/image/vietnam.jpg",
+    viewCount: 1250,
+    createdAt: ISODate("2025-05-12T10:30:00Z"),
+    updatedAt: ISODate("2025-05-18T15:45:00Z"),
+    publishedAt: ISODate("2025-05-18T15:45:00Z")
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439025"),
+    title: "Hoạt động Lễ hội Làng Sen năm 2025 chào mừng kỷ niệm 135 năm ngày sinh Chủ tịch Hồ Chí Minh",
+    slug: "du-lich-sinh-thai-Nghe",
+    content: "Lễ hội Làng Sen năm 2025 diễn ra tại thành phố Vinh và huyện Nam Đàn, Nghệ An, được tổ chức quy mô cấp quốc gia với nhiều hoạt động phong phú, đặc sắc.\nLễ hội Làng Sen năm 2025 diễn ra từ ngày 12-19/5 tại thành phố Vinh và huyện Nam Đàn, Nghệ An được tổ chức quy mô cấp quốc gia với nhiều hoạt động phong phú, đặc sắc chào mừng kỷ niệm 135 năm Ngày sinh Chủ tịch Hồ Chí Minh (19/5/1890-19/5/2025).\nĐây là hoạt động chính trị, văn hóa có ý nghĩa quan trọng, thể hiện lòng biết ơn, thành kính của nhân dân đối với Chủ tịch Hồ Chí Minh.\nChiều 16/5, tại Trung tâm Nghệ thuật truyền thống tỉnh Nghệ An (TP. Vinh), Hội diễn Nghệ thuật quần chúng “Tiếng hát Làng Sen” toàn quốc năm 2025 đã chính thức khai mạc trong không khí trang nghiêm và xúc động, hướng tới kỷ niệm 135 năm Ngày sinh Chủ tịch Hồ Chí Minh (19/5/1890 - 19/5/2025).\nTham dự lễ khai mạc có đồng chí Ninh Thị Thu Hương - Cục trưởng Cục Văn hóa cơ sở, Gia đình và Thư viện (Bộ Văn hóa, Thể thao và Du lịch); các đồng chí Ủy viên Ban Chấp hành Đảng bộ tỉnh Nghệ An: Nguyễn Như Khôi - Phó Chủ tịch HĐND tỉnh; Trần Thị Mỹ Hạnh - Giám đốc Sở Văn hóa - Thể thao và Du lịch; cùng đại diện lãnh đạo các ban, sở, ngành và đông đảo văn nghệ sĩ, nghệ nhân, diễn viên đến từ 30 đoàn nghệ thuật quần chúng trên cả nước.",
+    authorId: ObjectId("507f1f77bcf86cd799439011"), // Refers to user "xuankien"
+    categories: ["Nghệ An", "Sinh thái", "Việt Nam"],
+    tags: ["du lịch", "sinh thái", "thiên nhiên", "văn hóa"],
+    status: "published",
+    featuredImage: "/image/lang-sen.jpg",
+    viewCount: 1250,
+    createdAt: ISODate("2025-05-16T10:30:00Z"),
+    updatedAt: ISODate("2025-05-18T15:45:00Z"),
+    publishedAt: ISODate("2025-05-18T15:45:00Z")
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439022"),
+    title: "Khám phá vẻ đẹp tiềm ẩn của du lịch Nghệ An",
+    slug: "kham-pha-ve-dep-tiem-an-du-lich-nghe-an",
+    content: "Nghệ An, mảnh đất miền Trung đầy nắng gió, không chỉ nổi tiếng với những trang sử hào hùng mà còn ẩn chứa bao điều kỳ thú của thiên nhiên và văn hóa. Từ những bãi biển trải dài với bờ cát trắng mịn, những hòn đảo hoang sơ với làn nước trong xanh như ngọc, đến những khu rừng nguyên sinh với hệ động thực vật phong phú, Nghệ An hứa hẹn mang đến cho du khách những trải nghiệm du lịch khó quên. Đến với Nghệ An, bạn còn được khám phá những di tích lịch sử văn hóa lâu đời, thưởng thức những món ăn đặc sản đậm đà hương vị miền Trung, và cảm nhận sự nồng hậu, chân chất của người dân nơi đây.\n\n**Những điểm đến không thể bỏ qua:**\n\n* **Biển Cửa Lò:** Một trong những bãi biển đẹp nhất miền Bắc, với bờ cát dài, nước biển trong xanh và nhiều hoạt động vui chơi giải trí hấp dẫn.\n* **Vườn quốc gia Pù Mát:** Khu rừng nguyên sinh với hệ sinh thái đa dạng, là nơi sinh sống của nhiều loài động vật quý hiếm.\n* **Khu di tích Kim Liên:** Quê hương của Chủ tịch Hồ Chí Minh, nơi lưu giữ những dấu ấn về cuộc đời và sự nghiệp của Người.\n* **Đảo Lan Châu:** Hòn đảo xinh đẹp gần Cửa Lò với cảnh quan thiên nhiên hoang sơ.\n* **Các làng nghề truyền thống:** Khám phá các làng nghề làm nước mắm, dệt chiếu, chế tác đá mỹ nghệ...\n\n**Ẩm thực Nghệ An:**\n\n* **Mực nháy Cửa Lò:** Món hải sản tươi ngon nổi tiếng.\n* **Súp lươn:** Món ăn bổ dưỡng và đậm đà hương vị.\n* **Bánh đa xúc hến:** Món ăn dân dã nhưng rất hấp dẫn.\n* **Tương Nam Đàn:** Đặc sản nổi tiếng của quê hương Bác Hồ.\n\nVới những tiềm năng du lịch đa dạng, Nghệ An đang ngày càng trở thành điểm đến hấp dẫn du khách trong và ngoài nước.",
+    authorId: ObjectId("507f1f77bcf86cd799439012"), // Refers to user "xuanthuy"
+    categories: ["Du lịch", "Nghệ An", "Việt Nam"],
+    tags: ["Nghệ An", "du lịch", "văn hóa", "ẩm thực"],
+    status: "published",
+    featuredImage: "/image/nghean3.jpg",
+    viewCount: 1000,
+    createdAt: ISODate("2025-07-28T08:00:00Z"),
+    updatedAt: ISODate("2025-07-28T08:00:00Z"),
+    publishedAt: ISODate("2025-07-28T08:00:00Z")
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439028"),
+    title: "Khai mạc Lễ hội Làng Sen 2025 với Chương trình nghệ thuật đặc sắc “Tượng đài trong muôn triệu trái tim”",
+    slug: "kham-pha-ve-dep-tiem-an-du-lich-nghe-an5",
+    content: "Lễ hội Làng Sen 2025 là sự kiện chính trị, văn hóa trọng điểm, hướng tới Kỷ niệm 135 năm Ngày sinh Chủ tịch Hồ Chí Minh (19/5/1890 - 19/5/2025). Đây cũng là dịp để toàn Đảng, toàn dân và toàn quân bày tỏ lòng biết ơn, sự tri ân sâu sắc đối với Chủ tịch Hồ Chí Minh; tôn vinh những giá trị tư tưởng, đạo đức, phong cách của Người - nền tảng vững chắc cho sự nghiệp cách mạng hôm nay và mai sau. \nNăm nay, Lễ hội Làng Sen được tổ chức với quy mô cấp quốc gia, do tỉnh Nghệ An phối hợp với Bộ Văn hóa - Thể thao và Du lịch, Bộ Công an tổ chức. \n Ngoài các nghi lễ trang trọng như: Lễ dâng hoa tại Tượng đài Bác Hồ tại TP. Vinh; Lễ dâng hương, dâng hoa, báo công, tưởng niệm Chủ tịch Hồ Chí Minh tại Khu Di tích Kim Liên, các hoạt động văn hóa, thể thao, du lịch được tổ chức sôi nổi với sự tham gia của hàng trăm nghệ sĩ, diễn viên đến từ nhiều tỉnh, thành, đơn vị trên cả nước.",
+    authorId: ObjectId("507f1f77bcf86cd799439011"), // Refers to user "xuankien"
+    categories: ["Du lịch", "Nghệ An", "Việt Nam"],
+    tags: ["Nghệ An", "du lịch biển", "văn hóa", "ẩm thực"],
+    status: "published",
+    featuredImage: "/image/nghean4.jpg",
+    viewCount: 1000,
+    createdAt: ISODate("2025-06-28T08:00:00Z"),
+    updatedAt: ISODate("2025-06-29T08:00:00Z"),
+    publishedAt: ISODate("2025-07-28T08:00:00Z")
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439024"),
+    title: "Khám phá vẻ đẹp tiềm ẩn của du lịch Nghệ An",
+    slug: "kham-pha-ve-dep-tiem-an-du-lich-nghe-an-2",
+    content: "Nghệ An, mảnh đất miền Trung đầy nắng gió, không chỉ nổi tiếng với những trang sử hào hùng mà còn ẩn chứa bao điều kỳ thú của thiên nhiên và văn hóa. Từ những bãi biển trải dài với bờ cát trắng mịn, những hòn đảo hoang sơ với làn nước trong xanh như ngọc, đến những khu rừng nguyên sinh với hệ động thực vật phong phú, Nghệ An hứa hẹn mang đến cho du khách những trải nghiệm du lịch khó quên. Đến với Nghệ An, bạn còn được khám phá những di tích lịch sử văn hóa lâu đời, thưởng thức những món ăn đặc sản đậm đà hương vị miền Trung, và cảm nhận sự nồng hậu, chân chất của người dân nơi đây.\n\n**Những điểm đến không thể bỏ qua:**\n\n* **Biển Cửa Lò:** Một trong những bãi biển đẹp nhất miền Bắc, với bờ cát dài, nước biển trong xanh và nhiều hoạt động vui chơi giải trí hấp dẫn.\n* **Vườn quốc gia Pù Mát:** Khu rừng nguyên sinh với hệ sinh thái đa dạng, là nơi sinh sống của nhiều loài động vật quý hiếm.\n* **Khu di tích Kim Liên:** Quê hương của Chủ tịch Hồ Chí Minh, nơi lưu giữ những dấu ấn về cuộc đời và sự nghiệp của Người.\n* **Đảo Lan Châu:** Hòn đảo xinh đẹp gần Cửa Lò với cảnh quan thiên nhiên hoang sơ.\n* **Các làng nghề truyền thống:** Khám phá các làng nghề làm nước mắm, dệt chiếu, chế tác đá mỹ nghệ...\n\n**Ẩm thực Nghệ An:**\n\n* **Mực nháy Cửa Lò:** Món hải sản tươi ngon nổi tiếng.\n* **Súp lươn:** Món ăn bổ dưỡng và đậm đà hương vị.\n* **Bánh đa xúc hến:** Món ăn dân dã nhưng rất hấp dẫn.\n* **Tương Nam Đàn:** Đặc sản nổi tiếng của quê hương Bác Hồ.\n\nVới những tiềm năng du lịch đa dạng, Nghệ An đang ngày càng trở thành điểm đến hấp dẫn du khách trong và ngoài nước.",
+    authorId: ObjectId("507f1f77bcf86cd799439011"), // Refers to user "xuankien"
+    categories: ["Du lịch", "Nghệ An", "Việt Nam"],
+    tags: ["Nghệ An", "du lịch biển", "văn hóa", "ẩm thực"],
+    status: "published",
+    featuredImage: "/image/nghean1.jpg",
+    viewCount: 1000,
+    createdAt: ISODate("2025-07-28T08:00:00Z"),
+    updatedAt: ISODate("2025-07-28T08:00:00Z"),
+    publishedAt: ISODate("2025-07-28T08:00:00Z")
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439023"),
+    title: "Ẩm thực đường phố Hà Nội - Những món ăn không thể bỏ lỡ",
+    slug: "am-thuc-duong-pho-ha-noi",
+    content: "Hà Nội không chỉ nổi tiếng với những danh lam thắng cảnh, mà còn là thiên đường của ẩm thực đường phố. Dạo quanh các con phố cổ, bạn sẽ dễ dàng bắt gặp những quán ăn nhỏ với những món ăn hấp dẫn, mang đậm hương vị đặc trưng của thủ đô. Dưới đây là một vài món ăn bạn không thể bỏ lỡ khi đến Hà Nội:\n\n* **Phở bò:** Món ăn quốc hồn quốc túy của Việt Nam, với nước dùng đậm đà, thịt bò mềm ngọt và bánh phở dai ngon.\n* **Bún chả:** Món ăn trưa phổ biến với bún lá, chả nướng thơm lừng và nước chấm chua ngọt.\n* **Xôi xéo:** Món xôi dẻo thơm với đậu xanh, hành phi và ruốc.\n* **Bánh cuốn:** Món ăn nhẹ với lớp bánh tráng mỏng mịn, nhân thịt băm và nấm, ăn kèm với nước chấm.\n* **Cà phê trứng:** Món đồ uống độc đáo với vị cà phê đậm đà hòa quyện với vị béo ngậy của trứng.\n\nNgoài ra, bạn cũng có thể thưởng thức các món ăn vặt khác như nem lụi, bánh gối, ốc luộc, nộm bò khô... Ẩm thực đường phố Hà Nội chắc chắn sẽ mang đến cho bạn những trải nghiệm khó quên.",
+    authorId: ObjectId("507f1f77bcf86cd799439011"), // Refers to user "xuankien"
+    categories: ["Ẩm thực", "Hà Nội", "Việt Nam"],
+    tags: ["Hà Nội", "ẩm thực", "đường phố", "món ăn"],
+    status: "published",
+    featuredImage: "/image/hanoi-street-food.jpg",
+    viewCount: 2000,
+    createdAt: ISODate("2025-07-25T10:00:00Z"),
+    updatedAt: ISODate("2025-07-25T10:00:00Z"),
+    publishedAt: ISODate("2025-07-25T10:00:00Z")
+  }
+]);
+db.posts.insertMany([
+  {
+    _id: ObjectId(), // MongoDB sẽ tự động tạo ID mới
+    title: "Văn Nghệ Làng Sen 2024 Rực Rỡ Sắc Màu Văn Hóa",
+    slug: "van-nghe-lang-sen-2024",
+    content: "Chương trình Văn Nghệ Làng Sen năm 2024 đã diễn ra thành công tốt đẹp, thu hút đông đảo người dân và du khách tham dự. Với nhiều tiết mục đặc sắc, đậm đà bản sắc văn hóa xứ Nghệ, chương trình đã góp phần làm phong phú thêm các hoạt động của Lễ hội Làng Sen, kỷ niệm ngày sinh Chủ tịch Hồ Chí Minh. Các tiết mục ca múa nhạc truyền thống, các làn điệu dân ca ngọt ngào đã tái hiện một không gian văn hóa đặc trưng của quê hương Bác.",
+    authorId: ObjectId("507f1f77bcf86cd799439011"), // Giả sử tác giả là "xuankien"
+    categories: ["Văn hóa", "Nghệ An", "Sự kiện"],
+    tags: ["Làng Sen", "văn nghệ", "văn hóa xứ Nghệ", "sự kiện văn hóa"],
+    status: "published",
+    featuredImage: "/image/van-nghe-lang-sen-2024.jpg", // Thay URL ảnh phù hợp
+    viewCount: 850,
+    createdAt: ISODate("2024-05-18T19:00:00Z"),
+    updatedAt: ISODate("2024-05-20T10:30:00Z"),
+    publishedAt: ISODate("2024-05-20T10:30:00Z")
+  },
+  {
+    _id: ObjectId(), // MongoDB sẽ tự động tạo ID mới
+    title: "Huyện Yên Thành Giành Giải Thưởng Lớn tại Ngày Sách 2024 Tỉnh Nghệ An",
+    slug: "giai-thuong-ngay-sach-yen-thanh-2024",
+    content: "Trong khuôn khổ Chương trình Ngày Sách Việt Nam năm 2024 của tỉnh Nghệ An, huyện Yên Thành đã xuất sắc giành được giải thưởng lớn nhờ những đóng góp tích cực trong việc phát triển văn hóa đọc và tổ chức các hoạt động ý nghĩa liên quan đến sách. Giải thưởng này là sự ghi nhận cho những nỗ lực của các cấp chính quyền, thư viện và người dân Yên Thành trong việc lan tỏa tình yêu sách và khuyến khích thói quen đọc sách trong cộng đồng.",
+    authorId: ObjectId("507f1f77bcf86cd799439011"), // Giả sử tác giả là "xuanthuy"
+    categories: ["Giáo dục", "Nghệ An", "Tin tức"],
+    tags: ["Ngày Sách Việt Nam", "Nghệ An", "Yên Thành", "văn hóa đọc", "giải thưởng"],
+    status: "published",
+    featuredImage: "/image/ngay-sach-yen-thanh-2024.jpg", // Thay URL ảnh phù hợp
+    viewCount: 620,
+    createdAt: ISODate("2025-05-17T14:45:00Z"),
+    updatedAt: ISODate("2025-05-28T09:15:00Z"),
+    publishedAt: ISODate("2025-05-28T09:15:00Z")
+  }
+]);
+
+db.posts.find({ $or: [ { title: /Làng Sen 2024/ }, { title: /Yên Thành/ } ] }).pretty() // Kiểm tra các bài đăng vừa thêm
+// Collection: comments
+print("--- Inserting comments data... ---");
+db.comments.insertMany([
+  {
+    _id: ObjectId("507f1f77bcf86cd799439031"),
+    postId: ObjectId("507f1f77bcf86cd799439021"),
+    userId: ObjectId("507f1f77bcf86cd799439012"), // User "xuanthuy"
+    content: "Bài viết rất hay và bổ ích! Tôi muốn đi Cúc Phương ngay lập tức.",
+    createdAt: ISODate("2025-05-20T10:00:00Z"),
+    updatedAt: ISODate("2025-05-20T10:00:00Z"),
+    status: "approved"
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439032"),
+    postId: ObjectId("507f1f77bcf86cd799439021"),
+    userId: ObjectId("507f1f77bcf86cd799439011"), // User "xuankien"
+    content: "Cảm ơn bạn đã chia sẻ. Tôi đặc biệt thích phần về các tour du lịch cộng đồng.",
+    createdAt: ISODate("2025-05-22T15:30:00Z"),
+    updatedAt: ISODate("2025-05-22T15:30:00Z"),
+    status: "approved"
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439033"),
+    postId: ObjectId("507f1f77bcf86cd799439022"),
+    userId: ObjectId("507f1f77bcf86cd799439011"),
+    content: "Tôi là người Nghệ An, và tôi rất vui vì bạn đã giới thiệu về quê hương tôi!",
+    createdAt: ISODate("2025-08-01T09:00:00Z"),
+    updatedAt: ISODate("2025-08-01T09:00:00Z"),
+    status: "approved"
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439034"),
+    postId: ObjectId("507f1f77bcf86cd799439022"),
+    userId: ObjectId("507f1f77bcf86cd799439012"),
+    content: "Mình chưa có dịp đến Nghệ An, nhưng xem bài viết xong thấy muốn đi quá!",
+    createdAt: ISODate("2025-08-03T11:45:00Z"),
+    updatedAt: ISODate("2025-08-03T11:45:00Z"),
+    status: "pending"
+  },
+  {
+    _id: ObjectId("507f1f77bcf86cd799439035"),
+    postId: ObjectId("507f1f77bcf86cd799439023"),
+    userId: ObjectId("507f1f77bcf86cd799439011"),
+    content: "Bài viết này làm tôi đói bụng quá. Tôi thích nhất món phở bò ở Hà Nội.",
+    createdAt: ISODate("2025-08-10T08:30:00Z"),
+    updatedAt: ISODate("2025-08-10T08:30:00Z"),
+    status: "approved"
+  }
+]);
+print("--- All initial data inserted. ---");
+
+// --- Data Transformation: Convert string names to ObjectIds for categories/tags and string IDs for status in 'posts' ---
+print("--- Converting category, tag, and status strings to their respective IDs in posts... ---");
+
+// Fetch mappings for categories, tags, and statuses to use for updating posts
+var categoryMap = {};
+db.categories.find({}).forEach(function(cat) {
+  categoryMap[cat.name] = cat._id;
+});
+
+var tagMap = {};
+db.tags.find({}).forEach(function(tag) {
+  tagMap[tag.name] = tag._id;
+});
+
+var statusMap = {};
+db.statuses.find({}).forEach(function(s) {
+  statusMap[s.name] = s._id;
+});
+
+// Iterate through posts and update category, tag, and status fields with their IDs
+db.posts.find({}).forEach(function(post) {
+  var newCategories = [];
+  if (post.categories) {
+    post.categories.forEach(function(catName) {
+      if (categoryMap[catName]) {
+        newCategories.push(categoryMap[catName]);
+      } else {
+        print(`Warning: Category '${catName}' not found for post '${post.title}'.`);
+      }
+    });
+  }
+
+  var newTags = [];
+  if (post.tags) {
+    post.tags.forEach(function(tagName) {
+      if (tagMap[tagName]) {
+        newTags.push(tagMap[tagName]);
+      } else {
+        print(`Warning: Tag '${tagName}' not found for post '${post.title}'.`);
+      }
+    });
+  }
+
+  var newStatus = post.status; // Default to current string status
+  if (post.status && statusMap[post.status]) {
+    newStatus = statusMap[post.status]; // Use the _id (string) from the statuses collection
+  } else if (post.status) {
+    print(`Warning: Status '${post.status}' not found in statuses collection for post '${post.title}'.`);
+  }
+
+  db.posts.updateOne(
+    { _id: post._id },
+    { $set: { categories: newCategories, tags: newTags, status: newStatus } }
+  );
+});
+print("--- Posts updated with category, tag, and status IDs. ---");
+
+
+// --- Verification Queries ---
+print("\n--- Running Verification Queries ---");
+
+print("\n## Users Collection");
+print("--- All users: ---");
+db.users.find().pretty();
+
+print("\n--- Find user by username 'xuankien': ---");
+db.users.find({ username: "xuankien" }).pretty();
+
+print("\n--- Find users with role 'author': ---");
+db.users.find({ role: "author" }).pretty();
+
+print("\n## Posts Collection");
+print("--- All posts (after category/tag/status ID conversion): ---");
+db.posts.find().pretty();
+
+print("\n--- Find post by ID: ObjectId('507f1f77bcf86cd799439021'): ---");
+db.posts.find({ _id: ObjectId("507f1f77bcf86cd799439021") }).pretty();
+
+print("\n--- Find posts belonging to 'Du lịch' category (using ObjectId reference): ---");
+db.posts.find({ categories: ObjectId("664654b3c95e5b3e21c3b5d1") }).pretty();
+
+print("\n--- Find posts with 'thiên nhiên' tag (using ObjectId reference): ---");
+db.posts.find({ tags: ObjectId("664654b3c95e5b3e21c3b5d9") }).pretty();
+
+print("\n--- Find posts with status 'published' (using string ID): ---");
+db.posts.find({ status: "published" }).pretty();
+
+print("\n## Comments Collection");
+print("--- All comments: ---");
+db.comments.find().pretty();
+
+print("\n--- Find comments for post ID: ObjectId('507f1f77bcf86cd799439021'): ---");
+db.comments.find({ postId: ObjectId("507f1f77bcf86cd799439021") }).pretty();
+
+print("\n--- Distinct statuses found in comments: ---");
+db.comments.distinct('status');
+
+print("\n## Categories Collection");
+print("--- All categories: ---");
+db.categories.find().pretty();
+
+print("\n## Tags Collection");
+print("--- All tags: ---");
+db.tags.find().pretty();
+
+print("\n## Statuses Collection");
+print("--- All statuses: ---");
+db.statuses.find().pretty();
+
+print("\n--- MongoDB script execution complete ---");
