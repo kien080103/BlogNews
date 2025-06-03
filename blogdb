@@ -1,17 +1,5 @@
 // Switch to the blogdb database
 use blogdb;
-
-// --- Cleanup: Drop existing collections to ensure a clean slate for re-running the script ---
-//print("--- Dropping existing collections... ---");
-//db.users.drop();
-//db.posts.drop();
-//db.comments.drop();
-//db.roles.drop();
-//db.categories.drop();
-//db.tags.drop();
-//db.statuses.drop();
-//print("--- Collections dropped. ---");
-
 // --- Collection Creation ---
 print("--- Creating collections... ---");
 db.createCollection('users');
